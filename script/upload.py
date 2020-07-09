@@ -4,9 +4,8 @@ import requests
 # Global client session
 session = requests.Session()
 
-
 #####
-# Login to Recogito, return the session
+# Login to Recogito
 #####
 def login():
   print(f'Logging in as: {cfg.RECOGITO_USER}')
