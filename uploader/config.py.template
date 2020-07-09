@@ -1,0 +1,16 @@
+#######################################
+# Base path of the Recogito instance
+#######################################
+RECOGITO_URL = 'http://localhost:9000'
+
+#######################################
+# Your user credentials
+#######################################
+RECOGITO_USER = 'test'
+RECOGITO_PW = 'test'
+
+#######################################
+# Document folder to upload from
+#######################################
+DOCUMENT_FOLDER = '../data'
+
