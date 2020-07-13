@@ -31,13 +31,22 @@ def get_documents_to_upload():
   return documents
 
 #####
+# List user directory from Recogito, so we can check if docs exist already
+#####
+def list_workspace_dir():
+  print('Downloading user directory from Recogito')
+
+  response = session.get(f'{cfg.RECOGITO_URL}/api/directory/my')
+  return [ i['title'] for i in response.json()['items'] ]
+
+#####
 # Login to Recogito
 #####
 def login():
   print(f'Logging in as: {cfg.RECOGITO_USER}')
 
   payload = { 'username': cfg.RECOGITO_USER, 'password': cfg.RECOGITO_PW }
-  return session.post('http://localhost:9000/login', data=payload)
+  return session.post(f'{cfg.RECOGITO_URL}/login', data=payload)
 
 #####
 # Initiate a new document upload, return the upload ID
@@ -87,9 +96,9 @@ def upload_one(document):
 ###############################
 documents = get_documents_to_upload()
 
-print(f'Uploading {len(documents)} documents')
-
 try:
+  print(f'Uploading {len(documents)} documents')
+
   response = login()
 
   if response.status_code != 200:
@@ -97,8 +106,14 @@ try:
 
   print('Login successful')
 
+  existing_documents = list_workspace_dir()
+  print(f'User workspace contains {len(existing_documents)} documents')
+
   for d in documents:
-    upload_one(d)
+    if d['title'] in existing_documents:
+      print(f'Document {d["title"]} is already in user workspace - skipping upload')
+    else:
+      upload_one(d)
 
 except:
   print(f'Login error: {response.status_code}')
