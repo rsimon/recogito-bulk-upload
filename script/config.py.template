@@ -14,3 +14,7 @@ RECOGITO_PW = 'test'
 #######################################
 DOCUMENT_FOLDER = '../data'
 
+#######################################
+# List of users to share with 
+#######################################
+SHARE_WITH = [ 'rainer' ]

@@ -1,6 +1,7 @@
 import config as cfg
 import glob
 import requests
+import time
 
 from os import listdir
 from os.path import isdir, join
@@ -34,8 +35,6 @@ def get_documents_to_upload():
 # List user directory from Recogito, so we can check if docs exist already
 #####
 def list_workspace_dir():
-  print('Downloading user directory from Recogito')
-
   response = session.get(f'{cfg.RECOGITO_URL}/api/directory/my')
   return [ i['title'] for i in response.json()['items'] ]
 
@@ -87,7 +86,24 @@ def upload_one(document):
   if response.status_code != 200:
     raise Exception(f'Could not finalize upload - failed with code: {response.status_code}')
 
-  print('Upload successful')
+  doc_id = response.json()['document_id']
+  print(f'Upload successful: {doc_id}')
+
+  return doc_id
+
+#####
+# Shares the document with the given ID with the pre-configured accounts
+#####
+def share_one(doc_id):
+  for username in cfg.SHARE_WITH:
+    response = session.put(f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/collaborator', json={
+      'collaborator': username, 'access_level': 'WRITE'
+    })   
+
+    if response.status_code != 200:
+      raise Exception(f'Could not share with user "{username}" - failed with code: {response.status_code}')
+    else:
+      print(f'Shared with user "{username}"')
 
 ###############################
 #
@@ -104,17 +120,18 @@ try:
   if response.status_code != 200:
     raise Exception(f'Login failed with code {response.status_code}')
 
-  print('Login successful')
-
   existing_documents = list_workspace_dir()
-  print(f'User workspace contains {len(existing_documents)} documents')
+  print(f'User workspace already contains {len(existing_documents)} documents')
 
   for d in documents:
+    print('-----------')
     if d['title'] in existing_documents:
       print(f'Document {d["title"]} is already in user workspace - skipping upload')
     else:
-      upload_one(d)
+      doc_id = upload_one(d)
+      share_one(doc_id)
 
-except:
-  print(f'Login error: {response.status_code}')
+    time.sleep(1) # Allow tiling to finish
 
+except Exception as e:
+  print(f'Error: {str(e)}')
