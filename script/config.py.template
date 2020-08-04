@@ -18,3 +18,17 @@ DOCUMENT_FOLDER = '../data'
 # List of users to share with 
 #######################################
 SHARE_WITH = [ 'rainer' ]
+
+#######################################
+# Tagging vocabulary
+#######################################
+TAG_VOCAB = [
+  'Brett fehlt oder brüchig',
+  'Bodenbrett fehlt oder brüchig',
+  'Klotz fehlt oder brüchig',
+  'Kennzeichen unleserlich bzw. doppelte Barcodes',
+  'Durchgebogene Palette',
+  'Folienfehler',
+  'Zettel',
+  'Ok'
+]

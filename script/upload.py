@@ -105,6 +105,17 @@ def share_one(doc_id):
     else:
       print(f'Shared with user "{username}"')
 
+#####
+# Sets a predfined tagging vocabulary for the document with the given ID
+#####
+def set_vocab_one(doc_id):
+  response = session.post(f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/prefs/tag-vocab', json=cfg.TAG_VOCAB)
+
+  if response.status_code != 200:
+    raise Exception(f'Could not set tag vocab for {doc_id} - failed with code: {response.status_code}')
+  else:
+    print(f'Set tag vocab for {doc_id}')
+
 ###############################
 #
 # Upload process starts here
@@ -130,6 +141,7 @@ try:
     else:
       doc_id = upload_one(d)
       share_one(doc_id)
+      set_vocab_one(doc_id)
 
     time.sleep(1) # Allow tiling to finish
 
