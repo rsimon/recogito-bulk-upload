@@ -21,19 +21,18 @@ def list_workspace_dir():
   return response.json()['items']
 
 #####
+# Download list of collaborators on this document
+#####
+def get_collaborators(doc_id):
+  response = session.get(f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/collaborators')
+  return [ collaborator['shared_with'] for collaborator in response.json() ]
+
+#####
 # Download JSON-LD annotations for the given document
 #####
 def get_annotations(doc_id):
   response = session.get(f'{cfg.RECOGITO_URL}/document/{doc_id}/downloads/annotations/jsonld')
   return response.json()
-
-#####
-# Download list of users this document is shared with
-#####
-def get_shared_with(doc_id):
-  # TODO doesn't seem to be available as an API route yet!
-  response = session.get(f'{cfg.RECOGITO_URL}')
-  return response
 
 #####
 # Counts contributions per user to the annotations
@@ -68,13 +67,19 @@ try:
   # Fetch all document IDs in the workspace root
   for item in list_workspace_dir():
     doc_id = item['id']
-    print(f'Downloading annotations for {doc_id}')
+    print(f'Downloading data for {doc_id}')
     
-    # TODO which users is this document shared with?
+    collaborators = get_collaborators(doc_id)
+    print(f'  Shared with: {", ".join(collaborators)}')
 
     annotations = get_annotations(doc_id)
+    print(f'  Document has {len(annotations)} annotations')
+
     contributions_per_user = count_contributions(annotations)
-    print(contributions_per_user)
+    for username in contributions_per_user:
+      print(f'    {username}: {contributions_per_user[username]} contributions')
+
+    # TODO check if every user has contributed
 
 except Exception as e:
   print(f'Error: {str(e)}')
