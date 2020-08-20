@@ -32,3 +32,8 @@ TAG_VOCAB = [
   'Zettel',
   'Ok'
 ]
+
+#######################################
+# Download from folder (set to False to download from root)
+#######################################
+DOWNLOAD_FOLDER = 'f65b8f0f-d510-42b2-945f-d28f92743c14'
