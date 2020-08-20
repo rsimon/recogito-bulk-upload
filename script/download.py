@@ -69,7 +69,7 @@ try:
     doc_id = item['id']
     print(f'Downloading data for {doc_id}')
     
-    collaborators = get_collaborators(doc_id)
+    collaborators = set(get_collaborators(doc_id))
     print(f'  Shared with: {", ".join(collaborators)}')
 
     annotations = get_annotations(doc_id)
@@ -79,7 +79,14 @@ try:
     for username in contributions_per_user:
       print(f'    {username}: {contributions_per_user[username]} contributions')
 
-    # TODO check if every user has contributed
+    # Check if every user has contributed
+    contributing_users = set(contributions_per_user.keys())
+    lazy_users = collaborators.difference(contributing_users)
+
+    if len(lazy_users) == 0:
+      print('  ALL ANNOTATORS HAVE CONTRIBUTED - ready to download')
+    else:
+      print(f'  {len(lazy_users)} users have not contributed yet ({", ".join(lazy_users)})')
 
 except Exception as e:
   print(f'Error: {str(e)}')
