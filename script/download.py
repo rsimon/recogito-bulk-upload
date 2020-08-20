@@ -17,7 +17,10 @@ def login():
 # List user directory from Recogito, so we can check if docs exist already
 #####
 def list_workspace_dir():
-  response = session.get(f'{cfg.RECOGITO_URL}/api/directory/my')
+  url = f'{cfg.RECOGITO_URL}/api/directory/my/{cfg.DOWNLOAD_FOLDER}' \
+    if (cfg.DOWNLOAD_FOLDER) else f'{cfg.RECOGITO_URL}/api/directory/my'
+  
+  response = session.get(url)
   return response.json()['items']
 
 #####
@@ -63,7 +66,7 @@ try:
 
   if response.status_code != 200:
     raise Exception(f'Login failed with code {response.status_code}')
-
+  
   # Fetch all document IDs in the workspace root
   for item in list_workspace_dir():
     doc_id = item['id']
