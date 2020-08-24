@@ -42,3 +42,8 @@ DOWNLOAD_FOLDER = 'f65b8f0f-d510-42b2-945f-d28f92743c14'
 # Destination folder to where downloaded annotation should go
 #######################################
 DOWNLOAD_ANNOTATIONS_TO = '../results/annotations'
+
+#######################################
+# Destination folder to where downloaded backups should go
+#######################################
+DOWNLOAD_BACKUPS_TO = '../results/backups'

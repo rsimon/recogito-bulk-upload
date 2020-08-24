@@ -56,9 +56,29 @@ def count_contributions(annotations):
 
   return contributions
 
+#####
+# Stores the JSON-LD annotations to a file named according to the document title
+#####
 def store_annotations(document_title, annotations):
   with open(f'{cfg.DOWNLOAD_ANNOTATIONS_TO}/{document_title}.json', 'w') as outfile:
     json.dump(annotations, outfile, indent=2)
+
+#####
+# Download a backup of the document because, you never know
+#####
+def download_backup(document_title, doc_id):
+  destination_file = f'{cfg.DOWNLOAD_BACKUPS_TO}/{document_title}.zip'
+  download_url = f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/zip-export'
+
+  with session.get(download_url, stream=True) as r:
+    r.raise_for_status()
+        
+    with open(destination_file, 'wb') as f:
+      for chunk in r.iter_content(chunk_size=8192): 
+        f.write(chunk)
+    
+  return destination_file
+
 
 ###############################
 #
@@ -101,6 +121,8 @@ try:
     # TODO only store annotations for completed documents
     store_annotations(item['title'], annotations)
 
+    # Optional. Comment out (on your own risk) if you don't want backups
+    download_backup(item['title'], doc_id)
 
 except Exception as e:
   print(f'Error: {str(e)}')
