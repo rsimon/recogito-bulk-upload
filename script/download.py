@@ -1,4 +1,5 @@
 import config as cfg
+import json
 import requests
 
 # Global client session
@@ -16,12 +17,12 @@ def login():
 #####
 # List user directory from Recogito, so we can check if docs exist already
 #####
-def list_workspace_dir():
+def list_items():
   url = f'{cfg.RECOGITO_URL}/api/directory/my/{cfg.DOWNLOAD_FOLDER}' \
     if (cfg.DOWNLOAD_FOLDER) else f'{cfg.RECOGITO_URL}/api/directory/my'
   
   response = session.get(url)
-  return response.json()['items']
+  return [ i for i in response.json()['items'] if i['type'] == 'DOCUMENT' ]
 
 #####
 # Download list of collaborators on this document
@@ -55,6 +56,9 @@ def count_contributions(annotations):
 
   return contributions
 
+def store_annotations(document_title, annotations):
+  with open(f'{cfg.DOWNLOAD_ANNOTATIONS_TO}/{document_title}.json', 'w') as outfile:
+    json.dump(annotations, outfile, indent=2)
 
 ###############################
 #
@@ -68,7 +72,10 @@ try:
     raise Exception(f'Login failed with code {response.status_code}')
   
   # Fetch all document IDs in the workspace root
-  for item in list_workspace_dir():
+  items = list_items()
+  print(f'Downloading data for {len(items)} documents')
+
+  for item in items:
     doc_id = item['id']
     print(f'Downloading data for {doc_id}')
     
@@ -90,6 +97,10 @@ try:
       print('  ALL ANNOTATORS HAVE CONTRIBUTED - ready to download')
     else:
       print(f'  {len(lazy_users)} users have not contributed yet ({", ".join(lazy_users)})')
+
+    # TODO only store annotations for completed documents
+    store_annotations(item['title'], annotations)
+
 
 except Exception as e:
   print(f'Error: {str(e)}')

@@ -34,6 +34,11 @@ TAG_VOCAB = [
 ]
 
 #######################################
-# Download from folder (set to False to download from root)
+# Download from this folder on Recogito (set to False to download from root)
 #######################################
 DOWNLOAD_FOLDER = 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+
+#######################################
+# Destination folder to where downloaded annotation should go
+#######################################
+DOWNLOAD_ANNOTATIONS_TO = '../results/annotations'
