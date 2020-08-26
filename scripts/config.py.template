@@ -1,7 +1,7 @@
 #######################################
 # Base path of the Recogito instance
 #######################################
-RECOGITO_URL = 'http://localhost:9000'
+RECOGITO_URL = 'https://recogito.pelagios.org'
 
 #######################################
 # Your user credentials
@@ -36,14 +36,14 @@ TAG_VOCAB = [
 #######################################
 # Download from this folder on Recogito (set to False to download from root)
 #######################################
-DOWNLOAD_FOLDER = 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+DOWNLOAD_FOLDER = False # 'f65b8f0f-d510-42b2-945f-d28f92743c14'
 
 #######################################
 # Destination folder to where downloaded annotation should go
 #######################################
-DOWNLOAD_ANNOTATIONS_TO = '../results/annotations'
+DOWNLOAD_ANNOTATIONS_TO = '../downloads/annotations'
 
 #######################################
 # Destination folder to where downloaded backups should go
 #######################################
-DOWNLOAD_BACKUPS_TO = '../results/backups'
+DOWNLOAD_BACKUPS_TO = '../downloads/backups'
