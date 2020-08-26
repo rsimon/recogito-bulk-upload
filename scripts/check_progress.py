@@ -25,15 +25,6 @@ def count_contributions(annotations):
 
   return contributions
 
-#####
-# Stores the JSON-LD annotations to a file named according to the document title
-#####
-def store_annotations(document_title, annotations):
-  with open(f'{cfg.DOWNLOAD_ANNOTATIONS_TO}/{document_title}.json', 'w') as outfile:
-    json.dump(annotations, outfile, indent=2)
-
-
-
 ###############################
 #
 # Check progress script starts here

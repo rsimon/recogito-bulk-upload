@@ -1,60 +1,11 @@
 import config as cfg
 import json
-import requests
+import logging
 
-# Global client session
-session = requests.Session()
+from recogito.recogito_client import RecogitoAPI
 
-#####
-# Login to Recogito
-#####
-def login():
-  print(f'Logging in as: {cfg.RECOGITO_USER}')
-
-  payload = { 'username': cfg.RECOGITO_USER, 'password': cfg.RECOGITO_PW }
-  return session.post(f'{cfg.RECOGITO_URL}/login', data=payload)
-
-#####
-# List user directory from Recogito, so we can check if docs exist already
-#####
-def list_items():
-  url = f'{cfg.RECOGITO_URL}/api/directory/my/{cfg.DOWNLOAD_FOLDER}' \
-    if (cfg.DOWNLOAD_FOLDER) else f'{cfg.RECOGITO_URL}/api/directory/my'
-  
-  response = session.get(url)
-  return [ i for i in response.json()['items'] if i['type'] == 'DOCUMENT' ]
-
-#####
-# Download list of collaborators on this document
-#####
-def get_collaborators(doc_id):
-  response = session.get(f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/collaborators')
-  return [ collaborator['shared_with'] for collaborator in response.json() ]
-
-#####
-# Download JSON-LD annotations for the given document
-#####
-def get_annotations(doc_id):
-  response = session.get(f'{cfg.RECOGITO_URL}/document/{doc_id}/downloads/annotations/jsonld')
-  return response.json()
-
-#####
-# Counts contributions per user to the annotations
-#####
-def count_contributions(annotations):
-  contributions = {}
-
-  for a in annotations:
-    for b in a['body']:
-      creator = b['creator'].split('/')
-      creator = creator[len(creator) - 1]
-
-      if creator in contributions:
-        contributions[creator] += 1
-      else:
-        contributions[creator] = 1
-
-  return contributions
+root = logging.getLogger()
+root.setLevel(logging.INFO)
 
 #####
 # Stores the JSON-LD annotations to a file named according to the document title
@@ -63,22 +14,6 @@ def store_annotations(document_title, annotations):
   with open(f'{cfg.DOWNLOAD_ANNOTATIONS_TO}/{document_title}.json', 'w') as outfile:
     json.dump(annotations, outfile, indent=2)
 
-#####
-# Download a backup of the document because, you never know
-#####
-def download_backup(document_title, doc_id):
-  destination_file = f'{cfg.DOWNLOAD_BACKUPS_TO}/{document_title}.zip'
-  download_url = f'{cfg.RECOGITO_URL}/document/{doc_id}/settings/zip-export'
-
-  with session.get(download_url, stream=True) as r:
-    r.raise_for_status()
-        
-    with open(destination_file, 'wb') as f:
-      for chunk in r.iter_content(chunk_size=8192): 
-        f.write(chunk)
-    
-  return destination_file
-
 
 ###############################
 #
@@ -86,43 +21,24 @@ def download_backup(document_title, doc_id):
 #
 ###############################
 try:
-  response = login()
-
-  if response.status_code != 200:
-    raise Exception(f'Login failed with code {response.status_code}')
+  client = RecogitoAPI.login({
+    'username': cfg.RECOGITO_USER,
+    'password': cfg.RECOGITO_PW, 
+    'server_url': cfg.RECOGITO_URL
+  })
   
   # Fetch all document IDs in the workspace root
-  items = list_items()
-  print(f'Downloading data for {len(items)} documents')
+  items = [ i for i in client.list_directory(cfg.DOWNLOAD_FOLDER)['items'] if i['type'] == 'DOCUMENT' ]
+  logging.info(f'Downloading data for {len(items)} documents')
 
   for item in items:
     doc_id = item['id']
-    print(f'Downloading data for {doc_id}')
+    logging.info(f'Downloading data for {doc_id}')
     
-    collaborators = set(get_collaborators(doc_id))
-    print(f'  Shared with: {", ".join(collaborators)}')
+    annotations = client.get_annotations(doc_id)
+    logging.info(f'  Document has {len(annotations)} annotations')
 
-    annotations = get_annotations(doc_id)
-    print(f'  Document has {len(annotations)} annotations')
-
-    contributions_per_user = count_contributions(annotations)
-    for username in contributions_per_user:
-      print(f'    {username}: {contributions_per_user[username]} contributions')
-
-    # Check if every user has contributed
-    contributing_users = set(contributions_per_user.keys())
-    lazy_users = collaborators.difference(contributing_users)
-
-    if len(lazy_users) == 0:
-      print('  ALL ANNOTATORS HAVE CONTRIBUTED - ready to download')
-    else:
-      print(f'  {len(lazy_users)} users have not contributed yet ({", ".join(lazy_users)})')
-
-    # TODO only store annotations for completed documents
     store_annotations(item['title'], annotations)
-
-    # Optional. Comment out (on your own risk) if you don't want backups
-    download_backup(item['title'], doc_id)
 
 except Exception as e:
   print(f'Error: {str(e)}')

@@ -11,3 +11,6 @@ client = RecogitoAPI.login({
   'server_url': cfg.RECOGITO_URL
 })
 
+    # Optional. Comment out (on your own risk) if you don't want backups
+    # client.download_backup(doc_id, item['title'])
+
