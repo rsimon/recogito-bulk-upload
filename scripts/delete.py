@@ -26,7 +26,7 @@ try:
     backup_filename = f'{cfg.DOWNLOAD_BACKUPS_TO}/{item["title"]}.zip'
     client.download_backup(doc_id, backup_filename)
 
-    # TODO delete
+    client.delete_document(doc_id)
 
 except Exception as e:
   logging.error(f'Error: {str(e)}')

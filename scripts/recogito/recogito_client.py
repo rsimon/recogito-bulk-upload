@@ -91,6 +91,15 @@ class RecogitoAPI:
         logging.info(f'Shared {doc_id} with user "{username}"')
 
   """
+  Deletes the document with the given ID - not reversable, use at your own risk
+  """
+  def delete_document(self, doc_id):
+    response = self.session.delete(f'{self.config["server_url"]}/api/document/{doc_id}')  
+
+    if response.status_code != 200:
+      raise Exception(f'Error deleting document {doc_id} - failed with code: {response.status_code}')
+
+  """
   Download list of collaborators on this document
   """
   def list_collaborators(self, doc_id):
