@@ -3,6 +3,10 @@ import requests
 
 class RecogitoAPI:
 
+  def __init__(self, config, session):
+    self.config = config
+    self.session = session
+
   """
   Config object needs the following props
 
@@ -12,25 +16,26 @@ class RecogitoAPI:
     'server_url': <recogito server base URL>
   }
   """
-  def __init__(self, config):
-    self.config = config
-    self.session = requests.Session()
+  @classmethod
+  def login(cls, conf):
+    logging.info(f'Logging in as: {conf["username"]}')
 
-  """
-  Always call login first before using other API methods
-  """
-  def login(self):
-    logging.info(f'Logging in as: {self.config.username}')
+    payload = { 'username': conf['username'], 'password': conf['password'] }
 
-    payload = { 'username': self.config.username, 'password': self.config.password }
-    return self.session.post(f'{self.config.server_url}/login', data=payload)
+    session = requests.Session()
+    response = session.post(f'{conf["server_url"]}/login', data=payload)
+
+    if response.status_code == 200:
+      return cls(conf, session)
+    else:
+      raise Exception(f'Login failed with code: {response.status_code}')
 
   """
   Lists the user directory (root or folder with the given ID)
   """
   def list_directory(self, folder = None):
-    url = f'{self.config.server_url}/api/directory/my/{folder}' \
-      if (folder) else f'{self.config.server_url}/api/directory/my'
+    url = f'{self.config["server_url"]}/api/directory/my/{folder}' \
+      if (folder) else f'{self.config["server_url"]}/api/directory/my'
   
     return self.session.get(url).json()
 
@@ -41,15 +46,15 @@ class RecogitoAPI:
   def upload_document(self, document):
 
     def init_new_document(title):
-      response = self.session.post(f'{self.config.server_url}/my/upload', files={ 'title': (None, title) })
+      response = self.session.post(f'{self.config["server_url"]}/my/upload', files={ 'title': (None, title) })
       return response.json()['id']
 
     def upload_file(filepath, upload_id):
       payload = { 'file': open(filepath, 'rb') }
-      return self.session.post(f'{self.config.server_url}/my/upload/{upload_id}/file', files=payload)
+      return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/file', files=payload)
 
     def finalize_document(upload_id):
-      return self.session.post(f'{self.config.server_url}/my/upload/{upload_id}/finalize')
+      return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/finalize')
 
     logging.info(f'Initiating upload: {document["title"]}')
 
@@ -76,7 +81,7 @@ class RecogitoAPI:
   """
   def share_document(self, doc_id, users):
     for username in users:
-      response = self.session.put(f'{self.config.server_url}/document/{doc_id}/settings/collaborator', json={
+      response = self.session.put(f'{self.config["server_url"]}/document/{doc_id}/settings/collaborator', json={
         'collaborator': username, 'access_level': 'WRITE'
       })   
 
@@ -89,19 +94,30 @@ class RecogitoAPI:
   Download list of collaborators on this document
   """
   def list_collaborators(self, doc_id):
-    return self.session.get(f'{self.config.server_url}/document/{doc_id}/settings/collaborators').json()
+    return self.session.get(f'{self.config["server_url"]}/document/{doc_id}/settings/collaborators').json()
+
+  """
+  Sets a predfined tagging vocabulary for the document with the given ID
+  """
+  def set_tag_vocab(self, doc_id, terms):
+    response = self.session.post(f'{self.config["server_url"]}/document/{doc_id}/settings/prefs/tag-vocab', json=terms)
+
+    if response.status_code != 200:
+      raise Exception(f'Could not set tag vocab for {doc_id} - failed with code: {response.status_code}')
+    else:
+      logging.info(f'Set tag vocab for {doc_id}')
 
   """
   Download JSON-LD annotations for the given document
   """
   def get_annotations(self, doc_id):
-    return self.session.get(f'{self.config.server_url}/document/{doc_id}/downloads/annotations/jsonld').json()
+    return self.session.get(f'{self.config["server_url"]}/document/{doc_id}/downloads/annotations/jsonld').json()
 
   """
   Download a backup of the document to the given filepath
   """
   def download_backup(self, doc_id, destination_file):
-    download_url = f'{self.config.server_url}/document/{doc_id}/settings/zip-export'
+    download_url = f'{self.config["server_url"]}/document/{doc_id}/settings/zip-export'
 
     with self.session.get(download_url, stream=True) as r:
       r.raise_for_status()
