@@ -41,4 +41,4 @@ try:
     store_annotations(item['title'], annotations)
 
 except Exception as e:
-  print(f'Error: {str(e)}')
+  logging.error(f'Error: {str(e)}')

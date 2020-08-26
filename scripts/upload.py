@@ -34,7 +34,6 @@ def get_documents_to_upload():
   return documents
 
 
-
 ###############################
 #
 # Upload process starts here
@@ -67,4 +66,4 @@ try:
     time.sleep(1) # Allow tiling to finish
 
 except Exception as e:
-  print(f'Error: {str(e)}')
+  logging.error(f'Error: {str(e)}')

@@ -65,4 +65,4 @@ try:
       logging.info(f'  {len(lazy_users)} users have not contributed yet ({", ".join(lazy_users)})')
 
 except Exception as e:
-  print(f'Error: {str(e)}')
+  logging.error(f'Error: {str(e)}')
