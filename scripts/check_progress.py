@@ -73,7 +73,8 @@ try:
 
   if len(incomplete_documents) > 0:
     titles = [ i['title'] for i in incomplete_documents ]
-    logging.warn(f'SUMMARY: There are {len(incomplete_documents)} left ({", ".join(titles)})')
+    logging.warn('')
+    logging.warn(f' SUMMARY: There are {len(incomplete_documents)} documents left to complete ({", ".join(titles)})')
   else:
     logging.info('')
     logging.info(' ##################################')
