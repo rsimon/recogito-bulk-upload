@@ -18,6 +18,9 @@ Bulk-upload documents to your Recogito workspace. The script reads from a folder
 __one subfolder for each document__ and add files to the subfolder. The script will create 
 one document for each folder, using the folder name as the document title.
 
+__The script will not re-upload. If your Recogito already contains a file with the same name,
+the upload will be skipped.__
+
 Example: the directory structure below will create two documents in Recogito ('palette-01' and 
 'palette-02'), with 3 and 4 image parts, respectively.
 

@@ -1,4 +1,4 @@
 **/__pycache__
-results/**/*.json
-results/**/*.zip
+downloads/annotations/*.json
+downloads/backups/*.zip
 config.py

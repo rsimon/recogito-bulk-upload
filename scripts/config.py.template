@@ -12,7 +12,7 @@ RECOGITO_PW = 'test'
 #######################################
 
 # Document folder to upload from
-DOCUMENT_FOLDER = '../data'
+DOCUMENT_FOLDER = '../uploads'
 
 # List of users to share uploaded documents with 
 SHARE_WITH = [ 'rainer' ]

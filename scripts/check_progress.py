@@ -41,6 +41,8 @@ try:
   items = [ i for i in client.list_directory(cfg.DOWNLOAD_FOLDER)['items'] if i['type'] == 'DOCUMENT' ]
   logging.info(f'Downloading data for {len(items)} documents')
 
+  incomplete_documents = []
+
   for item in items:
     doc_id = item['id']
     logging.info(f'Downloading data for {doc_id}')
@@ -67,6 +69,17 @@ try:
       logging.info('  ALL ANNOTATORS HAVE CONTRIBUTED - ready to download')
     else:
       logging.info(f'  {len(lazy_users)} users have not contributed yet ({", ".join(lazy_users)})')
+      incomplete_documents.append(item)
+
+  if len(incomplete_documents) > 0:
+    titles = [ i['title'] for i in incomplete_documents ]
+    logging.warn(f'SUMMARY: There are {len(incomplete_documents)} left ({", ".join(titles)})')
+  else:
+    logging.info('')
+    logging.info(' ##################################')
+    logging.info(' # ALL DOCUMENTS COMPLETE!')
+    logging.info(' ##################################')
+    logging.info('')
 
 except Exception as e:
   logging.error(f'Error: {str(e)}')
