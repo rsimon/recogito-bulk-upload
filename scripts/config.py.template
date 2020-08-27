@@ -1,27 +1,23 @@
 #######################################
-# Base path of the Recogito instance
+# Recogito access information
 #######################################
 RECOGITO_URL = 'https://recogito.pelagios.org'
 
-#######################################
 # Your user credentials
-#######################################
 RECOGITO_USER = 'test'
 RECOGITO_PW = 'test'
 
 #######################################
-# Document folder to upload from
+# Config for 'upload' script
 #######################################
+
+# Document folder to upload from
 DOCUMENT_FOLDER = '../data'
 
-#######################################
-# List of users to share with 
-#######################################
+# List of users to share uploaded documents with 
 SHARE_WITH = [ 'rainer' ]
 
-#######################################
-# Tagging vocabulary
-#######################################
+# Tagging vocabulary for uploaded documents
 TAG_VOCAB = [
   'Brett fehlt oder brüchig',
   'Bodenbrett fehlt oder brüchig',
@@ -34,16 +30,36 @@ TAG_VOCAB = [
 ]
 
 #######################################
-# Download from this folder on Recogito (set to False to download from root)
+# Config for 'check progress' script
 #######################################
-DOWNLOAD_FOLDER = False # 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+
+# List of people who must provide annotations
+# in order for the document to be considered 'complete'
+REQUIRED_ANNOTATORS = [
+  'rainer'
+]
 
 #######################################
-# Destination folder to where downloaded annotation should go
+# Config for 'download' script
 #######################################
+
+# If you want to download the contents of a 
+# folder in your Recogito workspace, set the folder ID here.
+# Set to False to download from the workspace root
+DOWNLOAD_FOLDER = False # 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+
+# Destination folder (on your machine) where downloaded annotation 
+# should be stored
 DOWNLOAD_ANNOTATIONS_TO = '../downloads/annotations'
 
 #######################################
-# Destination folder to where downloaded backups should go
+# Config for 'delete' script
 #######################################
+
+# If you want to delete the contents of a 
+# folder in your Recogito workspace, set the folder ID here.
+# Set to False to delete documents in the workspace root
+DELETE_FOLDER = False # 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+
+# Destination folder to where backups should be stored (before delete)
 DOWNLOAD_BACKUPS_TO = '../downloads/backups'

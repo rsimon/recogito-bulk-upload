@@ -27,7 +27,6 @@ try:
     'server_url': cfg.RECOGITO_URL
   })
   
-  # Fetch all document IDs in the workspace root
   items = [ i for i in client.list_directory(cfg.DOWNLOAD_FOLDER)['items'] if i['type'] == 'DOCUMENT' ]
   logging.info(f'Downloading data for {len(items)} documents')
 
