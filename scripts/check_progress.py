@@ -45,8 +45,12 @@ try:
     doc_id = item['id']
     logging.info(f'Downloading data for {doc_id}')
     
-    collaborators = set([ c['shared_with'] for c in client.list_collaborators(doc_id) ])
-    logging.info(f'  Shared with: {", ".join(collaborators)}')
+    # Note: we can use this to match against all collaborators, 
+    # but have decided to match against a pre-configured list instead.
+    #
+    # collaborators = set([ c['shared_with'] for c in client.list_collaborators(doc_id) ])
+    # logging.info(f'  Shared with: {", ".join(collaborators)}')
+    collaborators = set(cfg.REQUIRED_ANNOTATORS)
 
     annotations = client.get_annotations(doc_id)
     logging.info(f'  Document has {len(annotations)} annotations')
