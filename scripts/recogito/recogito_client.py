@@ -43,7 +43,7 @@ class RecogitoAPI:
   Uploading one document (with multiple files) to the workspace.
   Shape of the document object: { 'title': <title>, 'files': [ <list of filepaths> ] }
   """
-  def upload_document(self, document):
+  def upload_document(self, document, folder = None):
 
     def init_new_document(title):
       response = self.session.post(f'{self.config["server_url"]}/my/upload', files={ 'title': (None, title) })
@@ -54,7 +54,10 @@ class RecogitoAPI:
       return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/file', files=payload)
 
     def finalize_document(upload_id):
-      return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/finalize')
+      if (folder):
+        return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/finalize?folder={folder}')
+      else:
+        return self.session.post(f'{self.config["server_url"]}/my/upload/{upload_id}/finalize')
 
     logging.info(f'Initiating upload: {document["title"]}')
 

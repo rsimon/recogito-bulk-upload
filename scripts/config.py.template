@@ -14,6 +14,9 @@ RECOGITO_PW = 'test'
 # Document folder to upload from
 DOCUMENT_FOLDER = '../uploads'
 
+# Remote folder on Recogito to upload to
+REMOTE_FOLDER = None # or folder ID, e.g. 'f65b8f0f-d510-42b2-945f-d28f92743c14'
+
 # List of users to share uploaded documents with 
 SHARE_WITH = [ 'rainer' ]
 

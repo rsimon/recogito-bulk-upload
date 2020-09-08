@@ -50,7 +50,7 @@ try:
     'server_url': cfg.RECOGITO_URL
   })
 
-  existing_documents = [ i['title'] for i in client.list_directory()['items'] if i['type'] == 'DOCUMENT' ]
+  existing_documents = [ i['title'] for i in client.list_directory(cfg.REMOTE_FOLDER)['items'] if i['type'] == 'DOCUMENT' ]
   logging.info(f'User workspace already contains {len(existing_documents)} documents')
 
   for d in documents:
@@ -58,7 +58,7 @@ try:
     if d['title'] in existing_documents:
       logging.info(f'Document {d["title"]} is already in user workspace - skipping upload')
     else:
-      doc_id = client.upload_document(d)
+      doc_id = client.upload_document(d, cfg.REMOTE_FOLDER)
       
       client.share_document(doc_id, cfg.SHARE_WITH)
       client.set_tag_vocab(doc_id, cfg.TAG_VOCAB)
